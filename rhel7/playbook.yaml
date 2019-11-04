@@ -2,26 +2,27 @@
 - hosts: all
   become: yes
   vars:
-
     - rhel_repos:
-      - "rhel-7-server-ose-3.9-rpms"
-      - "rhel-7-server-ansible-2.6-rpms"
+        - "rhel-7-server-rpms"
+        - "rhel-7-server-extras-rpms"
+        - "rhel-7-server-ose-3.11-rpms"
+        - "rhel-7-server-ansible-2.6-rpms"
 
     - openshift_packages:
-      - openshift-ansible
+        - openshift-ansible
 
     - packages:
-      - openscap-scanner
-      - vim
-      - scap-security-guide
-      - git
-      - python2-boto3
-      - python2-boto
-      - python2-pip
-      - ansible
+        - openscap-scanner
+        - vim
+        - scap-security-guide
+        - git
+        - python2-boto3
+        - python2-boto
+        - python2-pip
+        - ansible
 
     - pip_user:
-      - awscli
+        - awscli
 
   tasks:
     - include_vars: rhel_vault.yaml
@@ -29,14 +30,14 @@
 
     - include_vars: repo_vars.yaml
 
-
     - name: Subscription Manager subscribe
       redhat_subscription:
         state: present
         username: "{{sm_username}}"
         password: "{{sm_password}}"
-
-        auto_attach: true
+        pool_ids:
+          - 8a85f9996defd909016e0373c76c356b
+          - 8a85f99c6e12d1d3016e131d073615bc
 
     - name: Attempt to install RHEL7 Server and Openshift Packages
       block:
@@ -54,7 +55,7 @@
 
     - name: upgrade all packages
       yum:
-        name: '*'
+        name: "*"
         state: latest
 
     - name: Install Workstation
@@ -101,11 +102,11 @@
       with_items: "{{pip_user}}"
 
     - name: Set git config email
-      command:   'git config --global user.email "{{git_email}}"'
+      command: 'git config --global user.email "{{git_email}}"'
       become_user: vagrant
 
     - name: Set git config email
-      command:   'git config --global user.name "{{git_username}}"'
+      command: 'git config --global user.name "{{git_username}}"'
       become_user: vagrant
 
     - name: Get updated files from git repository
